@@ -5,12 +5,25 @@ Running time:
 	because the work done processing each basket is normally quadratic in
 	the number of items it contains.
 
-Rule finding:
+Rule finding: This assumes that support of a rule X->Y is equal to sup(X)
 	Find all sets with support at least cs
 	Find all sets with support at least s
 	If S has support at least cs, see which subset X<S missing one element j have support at least s
 	Then X->j is an association rule with support (= support of X) greater than s and confidence
 	at least c (support of X is >s and support of S is >cs, then support of S/ support of X > c)
+	
+	PROBLEM: there are different sources that state that support of X->Y is equal to sup(X U Y). In this
+	case the algorithm to find rules is:
+		Find all sets with support at least s, D the list of all this sets
+		Find all subsets of each set previously found that has support at least s/c. s/c > s thus all this 
+		subsets will be in D too.
+	
+	The difference with the previous case is that in the previous we wanted sup(X)>s, which does not imply
+	sup(X U Y)>s (that's why we look for sup(X U Y)>cs, cs < s). 
+	
+	On the other hand, if sup(X U Y)>s, then sup(X)>s. Observe that in this case confidence of the rule with
+	X->Y will be always larger than s, because X U Y already appears more than s % of the times with respect to
+	all baskets, so X U Y will appear in at least as many baskets w.r.t the baskets that have X.
 	
 Finding frequent items:
 	Assumption that data is stored and disk and can't fit in memory.
