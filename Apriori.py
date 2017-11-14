@@ -8,6 +8,8 @@ def ruleFinding(s, c, datapath):
     print "Large itemset"
     print freq
     rules = []
+    support = []
+    confidence = []
     for i in range(len(freq)):
         if(len(freq[i])>1):
             for k in range(1,len(freq[i])):
@@ -17,8 +19,10 @@ def ruleFinding(s, c, datapath):
                     idx = freq.index(X)
                     if(sup[i]/sup[idx]>c):
                         rules.append((X,freq[i]-X))
+                        support.append(sup[i])
+                        confidence.append(sup[i]/sup[idx])
     
-    return rules
+    return rules, support, confidence
 
 
 
@@ -118,9 +122,10 @@ def main():
 #     print freq
 #     print sup
 
-    rules = ruleFinding(0.5, 0.5, "test.dat")
-    print "Results:"
-    print rules
+    rules, support, confidence = ruleFinding(0.2, 0.2, "test.dat")
+    print "Rules found: "
+    for i in range(len(rules)):     
+        print "Rule: " + str(rules[i][0]) + " -> " + str(rules[i][1]) + " with support " + str(support[i]) + " and confidence " + str(confidence[i])
     
 main() 
     
