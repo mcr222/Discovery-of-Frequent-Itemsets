@@ -1,0 +1,59 @@
+Running time:
+	We assume that baskets contain small numbers of items,
+	while items can be in very very large number of, of baskets.
+	The algorithms would take too much time if baskets contain large numbers of items,
+	because the work done processing each basket is normally quadratic in
+	the number of items it contains.
+
+Rule finding:
+	Find all sets with support at least cs
+	Find all sets with support at least s
+	If S has support at least cs, see which subset X<S missing one element j have support at least s
+	Then X->j is an association rule with support (= support of X) greater than s and confidence
+	at least c (support of X is >s and support of S is >cs, then support of S/ support of X > c)
+	
+Finding frequent items:
+	Assumption that data is stored and disk and can't fit in memory.
+	Stored basket-by-basket and we can generate all subsets of items within a basket (careful, we assume that
+	the number of items in a basket are low). We use k nested loops all sets of size k.
+	Goal: minimize the number of times each disk block has to be read into main memory
+	
+	Computation limitations:
+		Main memory is critical resource.
+		As we read baskets, we need to count occurrences of sets, but we cannot keep all the counters for all sets (a lot
+		of different combinations of items) in main memory, and swapping count variables is disastrous since the need of
+		access to such variables is essentially random.
+	
+	Main-Memory Counting for pairs of frequent items:
+		1.- Matrix approach: Count all pairs using a triangular matrix (T[i,j] = count of pairs {i,j})
+		2.- Tabular approach: keep a table with triplets [i,j,count], thus avoiding the triplets with count=0. Better
+		than matrix approach if at most 1/3 of all possible pairs actually occur (matrix stores an integer for all pairs, 
+		and tabular 3 integers for all existing pairs)
+		
+A priori algorithm:
+	In pass k of the data, we identify subsets of size k with a support greater than s (in pass 2 we will find frequent pairs)
+	Monotonicity: if a set of items appears at least s times, so does every subset of s.
+	**Observation: if we are interested in seeing support greater than s (then sup = s*N is the # of the counter), we can limit
+	our counter until sup (saving memory bytes), as we don't care of exactly the support it has, but just that it is >s.
+	
+	Using monotonicity then, for each pass, we keep the previous pass frequent items, ignoring item sets not in the previous 
+	pass frequent items. Ex:
+		That is, for pairs, we only consider singletons that are both frequent items individually (support >s).
+		In this case we can use a triangular matrix with only individual frequent items found in the previous pass as row and column.
+		
+	In general pass: 
+		L_k set of truly frequent k-sets
+		C_k candidate k-sets with potentially support >s, based on information from L_k-1 
+		Cicle: 
+			L_k-1 -> C_k : all C_k subsets of size k-1 must be in L_k-1. We generate items in C_k by taking all sets
+			in L_k-1 and adding singletons of L_1 with a value larger than the items in the set of L_k-1 used to generate
+			C_k.
+				We only need to add singletons of larger value to avoid repeating sets in C_k. Ex: we generate with 
+				L_3 {1,3,5}, if we add {2}, then {1,2,3,5} would have already been added if {1,2,3} is an element of L_3
+				(which is necessary) for {1,2,3,5} to be in C_4 thus don't need to add with {2} and {1,3,5}.
+			C_k -> L_k : pass on data counting which of the candidates in C_k-1 appears in the data with support >s.
+		
+		
+		
+		
+	
